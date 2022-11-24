@@ -1,4 +1,4 @@
-# Rabbiter
+# RabbitR
 A convenient library for working with RabbitMQ for consuming and publishing messages via JSON.
 Among the mechanisms:
 - Automatic reconnection in case of server unavailability

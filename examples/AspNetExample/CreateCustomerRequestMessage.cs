@@ -1,5 +1,5 @@
-﻿using Rabbiter.Messages;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using RabbitR.Messages;
 
 namespace AspNetExample;
 

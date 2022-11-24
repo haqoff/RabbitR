@@ -1,4 +1,4 @@
-﻿using Rabbiter.Messages;
+﻿using RabbitR.Messages;
 
 namespace IntegrationTests.Helpers.Messages;
 

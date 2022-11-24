@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Rabbiter.Producers;
+using RabbitR.Producers;
 
 namespace AspNetExample.Controllers
 {

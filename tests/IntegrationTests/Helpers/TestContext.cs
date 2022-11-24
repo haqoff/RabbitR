@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Rabbiter.Consumers;
-using Rabbiter.Producers;
+using RabbitR.Producers;
 
 namespace IntegrationTests.Helpers;
 

@@ -1,5 +1,5 @@
-﻿using Rabbiter.Consumers.Handlers;
-using Rabbiter.Producers;
+﻿using RabbitR.Consumers.Handlers;
+using RabbitR.Producers;
 
 namespace AspNetExample;
 

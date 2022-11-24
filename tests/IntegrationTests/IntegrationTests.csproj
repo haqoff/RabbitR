@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Rabbiter\Rabbiter.csproj" />
+    <ProjectReference Include="..\..\src\RabbitR.csproj" />
   </ItemGroup>
 
 </Project>

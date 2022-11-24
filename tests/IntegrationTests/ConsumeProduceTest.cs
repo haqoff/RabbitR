@@ -2,7 +2,7 @@
 using IntegrationTests.Helpers.Handlers;
 using IntegrationTests.Helpers.Messages;
 using Microsoft.Extensions.DependencyInjection;
-using Rabbiter.Consumers.Handlers;
+using RabbitR.Consumers.Handlers;
 
 namespace IntegrationTests;
 

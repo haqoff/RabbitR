@@ -2,9 +2,9 @@
 using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Rabbiter.Builders;
-using Rabbiter.Connections;
-using Rabbiter.Extensions;
+using RabbitR.Builders;
+using RabbitR.Connections;
+using RabbitR.Extensions;
 
 namespace IntegrationTests.Helpers;
 

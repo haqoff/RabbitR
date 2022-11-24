@@ -1,5 +1,5 @@
 using AspNetExample;
-using Rabbiter.Extensions;
+using RabbitR.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

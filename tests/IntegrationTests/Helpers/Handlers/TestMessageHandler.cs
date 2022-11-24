@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using Rabbiter.Consumers.Handlers;
-using Rabbiter.Messages;
+using RabbitR.Consumers.Handlers;
+using RabbitR.Messages;
 
 namespace IntegrationTests.Helpers.Handlers;
 
