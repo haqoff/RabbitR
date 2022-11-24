@@ -9,12 +9,13 @@
 		<Description>Convenient library for working with RabbitMQ. Provides a mechanism for processing and publishing messages.</Description>
 		<PackageProjectUrl>https://github.com/haqoff/RabbitR</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReadmeFile>nuget-readme.md</PackageReadmeFile>
 		<PackageTags>rabbit;rabbitmq;rabbit-mq;eventbus;rabbitr;mq;consume;publish;</PackageTags>
 		<Authors>Kirill Sizov</Authors>
 		<RepositoryType>git</RepositoryType>
 		<Version>7.0.0-rc</Version>
 		<PackageId>RabbitR</PackageId>
+		<Copyright>Copyright © 2022-present Kirill Sizov &lt;haqoff@gmail.com&gt;</Copyright>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -33,7 +34,7 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
-	  <None Include="..\README.md">
+	  <None Include="..\docs\nuget-readme.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
