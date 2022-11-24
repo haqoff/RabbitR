@@ -5,7 +5,15 @@ VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rabbiter", "src\Rabbiter\Rabbiter.csproj", "{AE87973F-D788-45E0-B929-1990B4FE4679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "tests\IntegrationTests\IntegrationTests.csproj", "{ABF4BDBD-9B50-4739-8078-DD7794039707}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "tests\IntegrationTests\IntegrationTests.csproj", "{ABF4BDBD-9B50-4739-8078-DD7794039707}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C74FDB44-CCC6-4BCC-B3DA-172B36AC9224}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{96E0A11C-CC51-4E0B-A947-9CCF72A55D64}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{735DA322-3D13-461A-9F9D-7E6202C8B0CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetExample", "examples\AspNetExample\AspNetExample.csproj", "{1FA62702-723F-4D99-94CA-B8D19D0E0D93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +29,18 @@ Global
 		{ABF4BDBD-9B50-4739-8078-DD7794039707}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABF4BDBD-9B50-4739-8078-DD7794039707}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABF4BDBD-9B50-4739-8078-DD7794039707}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FA62702-723F-4D99-94CA-B8D19D0E0D93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FA62702-723F-4D99-94CA-B8D19D0E0D93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FA62702-723F-4D99-94CA-B8D19D0E0D93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FA62702-723F-4D99-94CA-B8D19D0E0D93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AE87973F-D788-45E0-B929-1990B4FE4679} = {96E0A11C-CC51-4E0B-A947-9CCF72A55D64}
+		{ABF4BDBD-9B50-4739-8078-DD7794039707} = {C74FDB44-CCC6-4BCC-B3DA-172B36AC9224}
+		{1FA62702-723F-4D99-94CA-B8D19D0E0D93} = {735DA322-3D13-461A-9F9D-7E6202C8B0CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {69C1A8FC-8542-46C2-BFC2-A6E9B31840FC}

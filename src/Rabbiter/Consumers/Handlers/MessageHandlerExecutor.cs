@@ -17,14 +17,14 @@ internal class MessageHandlerExecutor<TMessage> : IMessageHandlerExecutor where 
     /// <summary>
     /// Deserializes the message, then calls the message handler.
     /// </summary>
-    public async Task ExecuteAsync(ISubscription item, IServiceProvider provider, IConsumerLogger logger, IModel model, BasicDeliverEventArgs @event, CancellationToken cancellationToken)
+    public async Task ExecuteAsync(string queueName, ISubscription item, IServiceProvider provider, IConsumerLogger logger, IModel model, BasicDeliverEventArgs @event, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
         {
             return;
         }
 
-        logger.LogMessageReceived(item.Name, item.MessageType, @event.DeliveryTag, @event.Body.Span);
+        logger.LogMessageReceived(queueName, item.MessageType, @event.DeliveryTag, @event.Body.Span);
 
         try
         {
@@ -33,7 +33,7 @@ internal class MessageHandlerExecutor<TMessage> : IMessageHandlerExecutor where 
             var message = JsonSerializer.Deserialize<TMessage>(@event.Body.Span)!;
             await handler.HandleAsync(message, cancellationToken);
             model.BasicAck(@event.DeliveryTag, false);
-            logger.LogMessageHandlingSuccess(item.Name, item.MessageType, @event.DeliveryTag);
+            logger.LogMessageHandlingSuccess(queueName, item.MessageType, @event.DeliveryTag);
         }
         catch (Exception e)
         {
@@ -41,12 +41,12 @@ internal class MessageHandlerExecutor<TMessage> : IMessageHandlerExecutor where 
             if (canRetry)
             {
                 model.BasicReject(@event.DeliveryTag, false);
-                logger.LogMessageHandlingErrorWithRetry(item.Name, item.MessageType, @event.DeliveryTag, e, attemptsMade, maxRetryCount);
+                logger.LogMessageHandlingErrorWithRetry(queueName, item.MessageType, @event.DeliveryTag, e, attemptsMade, maxRetryCount);
             }
             else
             {
                 model.BasicAck(@event.DeliveryTag, false);
-                logger.LogMessageHandlingCriticalError(item.Name, item.MessageType, @event.DeliveryTag, e, attemptsMade, maxRetryCount);
+                logger.LogMessageHandlingCriticalError(queueName, item.MessageType, @event.DeliveryTag, e, attemptsMade, maxRetryCount);
             }
         }
     }

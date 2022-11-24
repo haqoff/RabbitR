@@ -3,7 +3,7 @@ using Rabbiter.Consumers.Configurations;
 using Rabbiter.Consumers.Subscriptions;
 using Rabbiter.Utils;
 
-namespace Rabbiter.Builders.Results;
+namespace Rabbiter.Builders.Instances.Consumers;
 
 /// <summary>
 /// Represents the result of building consumer.

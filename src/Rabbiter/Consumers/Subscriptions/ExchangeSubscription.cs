@@ -1,4 +1,5 @@
-﻿using Rabbiter.Builders.Results;
+﻿using Rabbiter.Builders.Instances.Consumers;
+using Rabbiter.Builders.Instances.Operations.Results;
 
 namespace Rabbiter.Consumers.Subscriptions;
 
@@ -10,7 +11,14 @@ internal class ExchangeSubscription : ISubscription
     /// <summary>
     /// Initializes a new instance of the class <see cref="ExchangeSubscription"/>.
     /// </summary>
-    internal ExchangeSubscription(string name, Type messageType, ushort maxDegreeOfParallelism, string? customQueueName, DeadLetterCycleBuildResult? deadLetterCycle)
+    internal ExchangeSubscription(
+        string name,
+        Type messageType,
+        Type handlerType,
+        ushort maxDegreeOfParallelism,
+        DeadLetterCycleBuildResult? deadLetterCycle,
+        ExchangeDeclarationOperation? customExchange,
+        QueueDeclarationOperation? customQueue, QueueBindingOperation? customBinding)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -22,16 +30,15 @@ internal class ExchangeSubscription : ISubscription
             throw new ArgumentOutOfRangeException(nameof(maxDegreeOfParallelism), "The max degree of parallelism cannot be less than 1.");
         }
 
-        if (customQueueName is not null && string.IsNullOrWhiteSpace(customQueueName))
-        {
-            throw new ArgumentException("Custom queue name cannot be empty string.", nameof(customQueueName));
-        }
 
         Name = name;
         MaxDegreeOfParallelism = maxDegreeOfParallelism;
-        CustomQueueName = customQueueName;
         DeadLetterCycle = deadLetterCycle;
+        CustomExchange = customExchange;
+        CustomQueue = customQueue;
+        CustomBinding = customBinding;
         MessageType = messageType;
+        HandlerType = handlerType;
     }
 
     /// <summary>
@@ -50,13 +57,27 @@ internal class ExchangeSubscription : ISubscription
     public ushort MaxDegreeOfParallelism { get; }
 
     /// <summary>
-    /// The name of the queue that will be associated with the exchange named <see cref="Name"/> and from which consumption will occur.
-    /// If not specified, the default name will be used.
-    /// </summary>
-    public string? CustomQueueName { get; }
-
-    /// <summary>
     /// The type of message into which the received bytes will be deserialized.
     /// </summary>
     public Type MessageType { get; }
+
+    /// <summary>
+    /// Handler type.
+    /// </summary>
+    public Type HandlerType { get; }
+
+    /// <summary>
+    /// Customization of the creation of the exchange.
+    /// </summary>
+    public ExchangeDeclarationOperation? CustomExchange { get; }
+
+    /// <summary>
+    /// Customization of the creation of the queue.
+    /// </summary>
+    public QueueDeclarationOperation? CustomQueue { get; }
+
+    /// <summary>
+    /// Custom binding operation.
+    /// </summary>
+    public QueueBindingOperation? CustomBinding { get; }
 }

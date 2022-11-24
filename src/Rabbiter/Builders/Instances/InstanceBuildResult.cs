@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Rabbiter.Builders.Instances.Consumers;
+using Rabbiter.Builders.Instances.Operations.Results;
+using Rabbiter.Builders.Instances.Producers;
 using Rabbiter.Connections;
 using Rabbiter.Utils;
 
-namespace Rabbiter.Builders.Results;
+namespace Rabbiter.Builders.Instances;
 
 /// <summary>
 /// Represents the result of building instance.
@@ -12,7 +15,13 @@ internal class InstanceBuildResult
     /// <summary>
     /// Initializes a new instance of the class <see cref="InstanceBuildResult"/>.
     /// </summary>
-    internal InstanceBuildResult(string name, ConnectionConfig connectionConfig, ConsumerBuildResult? consumer, ProducerBuildResult? producer)
+    internal InstanceBuildResult(
+        string name,
+        ConnectionConfig connectionConfig,
+        ConsumerBuildResult? consumer,
+        ProducerBuildResult? producer,
+        InitOperationContainerBuildResult? initOperationContainer
+    )
     {
         RabbiterValidator.ThrowIfNotValid(connectionConfig);
         if (consumer is null && producer is null)
@@ -24,6 +33,7 @@ internal class InstanceBuildResult
         ConnectionConfig = connectionConfig;
         Consumer = consumer;
         Producer = producer;
+        InitOperationContainer = initOperationContainer;
     }
 
     /// <summary>
@@ -45,4 +55,9 @@ internal class InstanceBuildResult
     /// Producer settings.
     /// </summary>
     internal ProducerBuildResult? Producer { get; }
+
+    /// <summary>
+    /// A container of operations that must be performed to initialize Rabbit MQ.
+    /// </summary>
+    internal InitOperationContainerBuildResult? InitOperationContainer { get; }
 }

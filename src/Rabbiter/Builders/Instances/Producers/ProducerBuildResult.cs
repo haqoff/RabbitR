@@ -1,7 +1,7 @@
 ﻿using Rabbiter.Producers;
 using Rabbiter.Utils;
 
-namespace Rabbiter.Builders.Results;
+namespace Rabbiter.Builders.Instances.Producers;
 
 /// <summary>
 /// Represents the result of building producer.

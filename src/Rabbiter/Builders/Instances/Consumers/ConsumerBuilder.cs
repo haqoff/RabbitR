@@ -1,9 +1,9 @@
-﻿using Rabbiter.Builders.Results;
-using Rabbiter.Consumers.Configurations;
+﻿using Rabbiter.Consumers.Configurations;
+using Rabbiter.Consumers.Handlers;
 using Rabbiter.Consumers.Subscriptions;
 using Rabbiter.Messages;
 
-namespace Rabbiter.Builders;
+namespace Rabbiter.Builders.Instances.Consumers;
 
 /// <summary>
 /// Represents the consumer builder, configuring subscriptions.
@@ -23,13 +23,17 @@ public class ConsumerBuilder
 
     /// <summary>
     /// Subscribes to the specified exchange.
+    /// Declaring the specified exchange and also creates an associated queue from which to consume.
     /// </summary>
-    /// <typeparam name="TMessage">Message.</typeparam>
+    /// <typeparam name="TMessage">Message type.</typeparam>
+    /// <typeparam name="THandler">Handler type.</typeparam>
     /// <param name="name">Exchange name.</param>
     /// <param name="actionBuilder">An action that configures the subscription.</param>
-    public ConsumerBuilder SubscribeExchange<TMessage>(string name, Action<ExchangeSubscriptionBuilder<TMessage>>? actionBuilder = null) where TMessage : IEventBusMessage
+    public ConsumerBuilder SubscribeExchange<TMessage, THandler>(string name, Action<ExchangeSubscriptionBuilder<TMessage>>? actionBuilder = null)
+        where THandler : class, IEventBusMessageHandler<TMessage>
+        where TMessage : class, IEventBusMessage
     {
-        var builder = new ExchangeSubscriptionBuilder<TMessage>(name);
+        var builder = new ExchangeSubscriptionBuilder<TMessage>(name, typeof(THandler));
         actionBuilder?.Invoke(builder);
 
         var result = builder.Build();
@@ -40,13 +44,17 @@ public class ConsumerBuilder
 
     /// <summary>
     /// Subscribes to the specified queue.
+    /// The queue with the specified name will be created.
     /// </summary>
-    /// <typeparam name="TMessage">Message.</typeparam>
+    /// <typeparam name="TMessage">Message type.</typeparam>
+    /// <typeparam name="THandler">Handler type.</typeparam>
     /// <param name="name">Queue name.</param>
     /// <param name="actionBuilder">An action that configures the subscription.</param>
-    public ConsumerBuilder SubscribeQueue<TMessage>(string name, Action<QueueSubscriptionBuilder<TMessage>>? actionBuilder = null) where TMessage : IEventBusMessage
+    public ConsumerBuilder SubscribeQueue<TMessage, THandler>(string name, Action<QueueSubscriptionBuilder<TMessage>>? actionBuilder = null)
+        where THandler : class, IEventBusMessageHandler<TMessage>
+        where TMessage : class, IEventBusMessage
     {
-        var builder = new QueueSubscriptionBuilder<TMessage>(name);
+        var builder = new QueueSubscriptionBuilder<TMessage>(name, typeof(THandler));
         actionBuilder?.Invoke(builder);
 
         var result = builder.Build();

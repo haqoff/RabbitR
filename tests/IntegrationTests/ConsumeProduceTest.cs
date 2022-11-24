@@ -29,14 +29,9 @@ public class ConsumeProduceTest
                     {
                         consumerConfig.ConsumerGroup = "Test";
                         consumerConfig.MaxDegreeOfParallelism = 1;
-                    }, consumerBuilder => { consumerBuilder.SubscribeExchange<TextWithIntegerMessage>(testExchangeName); });
+                    }, consumerBuilder => { consumerBuilder.SubscribeExchange<TextWithIntegerMessage, TestMessageHandler<TextWithIntegerMessage>>(testExchangeName); });
 
-                    instanceBuilder.SetupProducer(producerConfig =>
-                    {
-                        producerConfig.AttemptDelay = TimeSpan.FromSeconds(1);
-                        producerConfig.MaxPoolLength = 1;
-                        producerConfig.MaxRetryCount = 1;
-                    });
+                    instanceBuilder.SetupProducer(producerConfig => { producerConfig.MaxPoolLength = 1; });
                 });
             });
 
@@ -62,7 +57,7 @@ public class ConsumeProduceTest
             .ThrowErrorAtCall(1);
 
         await using var context = TestHelper.CreateContext(
-            serviceCollectionBuilder: c => { c.AddSingleton<IEventBusMessageHandler<TextWithIntegerMessage>>(_ => handler); },
+            serviceCollectionBuilder: c => { c.AddScoped<IEventBusMessageHandler<TextWithIntegerMessage>>(_ => handler); },
             instanceCount: 1,
             builderAction: (containers, b) =>
             {
@@ -76,7 +71,7 @@ public class ConsumeProduceTest
                         consumerConfig.MaxDegreeOfParallelism = 2;
                     }, consumerBuilder =>
                     {
-                        consumerBuilder.SubscribeExchange<TextWithIntegerMessage>(testExchangeName, subscriptionBuilder =>
+                        consumerBuilder.SubscribeExchange<TextWithIntegerMessage, TestMessageHandler<TextWithIntegerMessage>>(testExchangeName, subscriptionBuilder =>
                         {
                             subscriptionBuilder.SetMaxDegreeOfParallelism(2);
                             subscriptionBuilder.UseDeadLetter(deadLetterBuilder =>
@@ -87,12 +82,7 @@ public class ConsumeProduceTest
                         });
                     });
 
-                    instanceBuilder.SetupProducer(producerConfig =>
-                    {
-                        producerConfig.AttemptDelay = TimeSpan.FromSeconds(1);
-                        producerConfig.MaxPoolLength = 1;
-                        producerConfig.MaxRetryCount = 1;
-                    });
+                    instanceBuilder.SetupProducer(producerConfig => { producerConfig.MaxPoolLength = 1; });
                 });
             });
 
@@ -129,17 +119,17 @@ public class ConsumeProduceTest
                 b.AddInstance(c => TestHelper.BindConfig(c, container), instanceBuilder =>
                 {
                     instanceBuilder.SetupConsumer(consumerConfig =>
-                    {
-                        consumerConfig.ConsumerGroup = "Test";
-                        consumerConfig.MaxDegreeOfParallelism = 5;
-                    }, consumerBuilder => { consumerBuilder.SubscribeExchange<TextWithIntegerMessage>(testExchangeName, exchangeBuilder => { exchangeBuilder.SetMaxDegreeOfParallelism(5); }); });
+                        {
+                            consumerConfig.ConsumerGroup = "Test";
+                            consumerConfig.MaxDegreeOfParallelism = 5;
+                        },
+                        consumerBuilder =>
+                        {
+                            consumerBuilder.SubscribeExchange<TextWithIntegerMessage, TestMessageHandler<TextWithIntegerMessage>>(testExchangeName,
+                                exchangeBuilder => { exchangeBuilder.SetMaxDegreeOfParallelism(5); });
+                        });
 
-                    instanceBuilder.SetupProducer(producerConfig =>
-                    {
-                        producerConfig.AttemptDelay = TimeSpan.FromSeconds(1);
-                        producerConfig.MaxPoolLength = 10;
-                        producerConfig.MaxRetryCount = 1;
-                    });
+                    instanceBuilder.SetupProducer(producerConfig => { producerConfig.MaxPoolLength = 10; });
                 });
             });
 

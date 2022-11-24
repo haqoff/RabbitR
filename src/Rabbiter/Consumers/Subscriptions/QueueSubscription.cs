@@ -10,7 +10,7 @@ internal class QueueSubscription : ISubscription
     /// <summary>
     /// Initializes a new instance of the class <see cref="QueueSubscription"/>.
     /// </summary>
-    internal QueueSubscription(string name, Type messageType, ushort maxDegreeOfParallelism)
+    internal QueueSubscription(string name, Type messageType, Type handlerType, ushort maxDegreeOfParallelism)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -24,6 +24,7 @@ internal class QueueSubscription : ISubscription
 
         Name = name;
         MessageType = messageType;
+        HandlerType = handlerType;
         MaxDegreeOfParallelism = maxDegreeOfParallelism;
     }
 
@@ -42,4 +43,9 @@ internal class QueueSubscription : ISubscription
     /// The type of message into which the received bytes will be deserialized.
     /// </summary>
     public Type MessageType { get; }
+
+    /// <summary>
+    /// Handler type.
+    /// </summary>
+    public Type HandlerType { get; }
 }

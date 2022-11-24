@@ -63,7 +63,7 @@ internal static class TestHelper
 
     public static void BindConfig(ConnectionConfig config, TestContainer container)
     {
-        config.Host = "localhost";
+        config.HostName = "localhost";
         config.Port = container.ConnectionPort;
         config.UserName = "guest";
         config.Password = "guest";

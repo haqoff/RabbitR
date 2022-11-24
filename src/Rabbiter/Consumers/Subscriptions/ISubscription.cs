@@ -22,4 +22,9 @@ internal interface ISubscription
     /// The type of message into which the received bytes will be deserialized.
     /// </summary>
     public Type MessageType { get; }
+
+    /// <summary>
+    /// Handler type.
+    /// </summary>
+    public Type HandlerType { get; }
 }

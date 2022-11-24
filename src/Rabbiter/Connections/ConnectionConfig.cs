@@ -8,10 +8,16 @@ namespace Rabbiter.Connections;
 public class ConnectionConfig : IValidatableObject
 {
     /// <summary>
-    /// Host.
+    /// Host name.
     /// </summary>
-    [Required(AllowEmptyStrings = false, ErrorMessage = "The host must be specified.")]
-    public string Host { get; set; } = null!;
+    [Required(AllowEmptyStrings = false, ErrorMessage = "The host name must be specified.")]
+    public string HostName { get; set; } = null!;   
+    
+    /// <summary>
+    /// Host name.
+    /// </summary>
+    [Required(AllowEmptyStrings = false, ErrorMessage = "The virtual host must be specified.")]
+    public string VirtualHost { get; set; } = "/";
 
     /// <summary>
     /// Port.
@@ -61,6 +67,6 @@ public class ConnectionConfig : IValidatableObject
     /// </summary>
     public override string ToString()
     {
-        return $"{Host}:{Port}";
+        return $"{HostName}:{Port}";
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Rabbiter.Builders.Instances;
 
-namespace Rabbiter.Builders.Results;
+namespace Rabbiter.Builders;
 
 /// <summary>
 /// Represents the result of building instances.

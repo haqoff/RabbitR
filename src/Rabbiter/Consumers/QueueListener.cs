@@ -42,7 +42,7 @@ internal class QueueListener
         consumer.Registered += (_, _) => HandleConsumerRegisteredAsync(queueName, subscriptionName);
         consumer.Shutdown += (_, @event) => HandleConsumerShutdownAsync(queueName, subscriptionName, @event);
         consumer.Unregistered += (_, _) => HandleConsumerUnregisteredAsync(queueName, subscriptionName);
-        consumer.Received += (_, @event) => _executor.ExecuteAsync(_subscription, _serviceProvider, _logger, model, @event, cancellationToken);
+        consumer.Received += (_, @event) => _executor.ExecuteAsync(queueName, _subscription, _serviceProvider, _logger, model, @event, cancellationToken);
 
         model.BasicQos(0, _subscription.MaxDegreeOfParallelism, false);
         var tag = model.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);

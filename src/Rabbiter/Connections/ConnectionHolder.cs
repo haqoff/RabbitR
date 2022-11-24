@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using Rabbiter.Builders.Results;
+using Rabbiter.Builders.Instances;
+using Rabbiter.Builders.Instances.Operations.Results;
 using Rabbiter.Loggers;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
@@ -65,10 +66,11 @@ internal class ConnectionHolder : IConnectionHolder
 
             var factory = new ConnectionFactory()
             {
-                HostName = connectionConfig.Host,
+                HostName = connectionConfig.HostName,
                 Port = connectionConfig.Port,
                 UserName = connectionConfig.UserName,
                 Password = connectionConfig.Password,
+                VirtualHost = connectionConfig.VirtualHost,
                 DispatchConsumersAsync = true,
                 AutomaticRecoveryEnabled = true,
                 NetworkRecoveryInterval = connectionConfig.RetryTimeout,
@@ -81,6 +83,11 @@ internal class ConnectionHolder : IConnectionHolder
             {
                 _logger.LogBeforeStart(instance.Name, connectionConfig);
                 var connection = factory.CreateConnection();
+                if (instance.InitOperationContainer is not null)
+                {
+                    InitInstance(instance.InitOperationContainer, connection);
+                }
+
                 _logger.LogConnectionSuccess(instance.Name, connectionConfig);
                 return connection;
             }
@@ -107,6 +114,31 @@ internal class ConnectionHolder : IConnectionHolder
         if (_disposed)
         {
             throw new ObjectDisposedException(nameof(ConnectionHolder));
+        }
+    }
+
+    private void InitInstance(InitOperationContainerBuildResult operationContainer, IConnection connection)
+    {
+        using var model = connection.CreateModel();
+
+        foreach (var item in operationContainer.ExchangeDeclarationOperations)
+        {
+            model.ExchangeDeclare(item.Exchange, item.Type, item.Durable, item.AutoDelete, item.Arguments);
+        }
+
+        foreach (var item in operationContainer.QueueDeclarationOperations)
+        {
+            model.QueueDeclare(item.Queue, item.Durable, item.Exclusive, item.AutoDelete, item.Arguments);
+        }
+
+        foreach (var operation in operationContainer.QueueBindingOperations)
+        {
+            model.QueueBind(operation.Queue, operation.Exchange, operation.RoutingKey, operation.Arguments);
+        }
+
+        foreach (var operation in operationContainer.ExchangeBindingOperations)
+        {
+            model.ExchangeBind(operation.Destination, operation.Source, operation.RoutingKey, operation.Arguments);
         }
     }
 }

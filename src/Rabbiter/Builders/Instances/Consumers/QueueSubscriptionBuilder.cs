@@ -2,7 +2,7 @@
 using Rabbiter.Consumers.Subscriptions;
 using Rabbiter.Messages;
 
-namespace Rabbiter.Builders;
+namespace Rabbiter.Builders.Instances.Consumers;
 
 /// <summary>
 /// Represents a subscription builder for an queue.
@@ -11,14 +11,16 @@ namespace Rabbiter.Builders;
 public class QueueSubscriptionBuilder<TMessage> where TMessage : IEventBusMessage
 {
     private readonly string _name;
+    private readonly Type _handlerType;
     private ushort _maxDegreeOfParallelism = 1;
 
     /// <summary>
     /// Initializes a new instance of the class <see cref="QueueSubscriptionBuilder{TMessage}"/>.
     /// </summary>
-    internal QueueSubscriptionBuilder(string name)
+    internal QueueSubscriptionBuilder(string name, Type handlerType)
     {
         _name = name;
+        _handlerType = handlerType;
     }
 
     /// <summary>
@@ -37,6 +39,6 @@ public class QueueSubscriptionBuilder<TMessage> where TMessage : IEventBusMessag
     /// </summary>
     internal QueueSubscription Build()
     {
-        return new QueueSubscription(_name, typeof(TMessage), _maxDegreeOfParallelism);
+        return new QueueSubscription(_name, typeof(TMessage), _handlerType, _maxDegreeOfParallelism);
     }
 }

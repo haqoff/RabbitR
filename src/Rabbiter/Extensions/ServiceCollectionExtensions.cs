@@ -3,6 +3,7 @@ using Rabbiter.Builders;
 using Rabbiter.Connections;
 using Rabbiter.Consumers;
 using Rabbiter.Consumers.Configurations;
+using Rabbiter.Consumers.Handlers;
 using Rabbiter.Loggers;
 using Rabbiter.Producers;
 
@@ -33,6 +34,7 @@ public static class ServiceCollectionExtensions
         collection.AddSingleton<IConsumer, Consumer>();
         collection.AddSingleton(p => new ConsumerHostedService(p.GetRequiredService<IConsumer>(), result));
         collection.AddHostedService(p => p.GetRequiredService<ConsumerHostedService>());
+        collection.AddConsumerHandlers(result);
 
         // producer
         collection.AddSingleton<IProducerLogger, ProducerLogger>();
@@ -44,5 +46,23 @@ public static class ServiceCollectionExtensions
         );
 
         return collection;
+    }
+
+    private static void AddConsumerHandlers(this IServiceCollection collection, RabbiterBuildResult result)
+    {
+        var handlerInterfaceType = typeof(IEventBusMessageHandler<>);
+        foreach (var instance in result.Instances)
+        {
+            if (instance.Consumer is null)
+            {
+                continue;
+            }
+
+            foreach (var subscription in instance.Consumer.Items)
+            {
+                var serviceType = handlerInterfaceType.MakeGenericType(subscription.MessageType);
+                collection.AddScoped(serviceType, subscription.HandlerType);
+            }
+        }
     }
 }

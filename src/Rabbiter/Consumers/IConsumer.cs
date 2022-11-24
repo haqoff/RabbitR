@@ -1,4 +1,4 @@
-﻿using Rabbiter.Builders.Results;
+﻿using Rabbiter.Builders.Instances;
 
 namespace Rabbiter.Consumers;
 

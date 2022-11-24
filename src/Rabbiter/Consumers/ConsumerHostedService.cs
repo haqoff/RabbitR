@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Rabbiter.Builders.Results;
+using Rabbiter.Builders;
 
 namespace Rabbiter.Consumers;
 

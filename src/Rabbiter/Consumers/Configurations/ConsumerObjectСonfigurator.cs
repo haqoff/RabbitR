@@ -32,52 +32,113 @@ internal class ConsumerObjectСonfigurator : IConsumerObjectConfigurator
         return mainQueueName;
     }
 
-    private static string SetupExchangeConsuming(ExchangeSubscription exchangeSubscription, IModel model, ConsumerConfig config)
+    private static string SetupExchangeConsuming(ExchangeSubscription sub, IModel model, ConsumerConfig config)
     {
-        var mainQueueName = exchangeSubscription.CustomQueueName ?? ConsumerObjectNameHelper.GetConsumerGroupMainQueue(config.ConsumerGroup, exchangeSubscription.Name);
-        model.ExchangeDeclare(exchange: exchangeSubscription.Name, type: "fanout", durable: true, autoDelete: false, arguments: null);
+        var mainQueueName = sub.CustomQueue?.Queue ?? ConsumerObjectNameHelper.GetConsumerGroupMainQueue(config.ConsumerGroup, sub.Name);
+        model.ExchangeDeclare(
+            exchange: sub.Name,
+            type: sub.CustomExchange?.Type ?? "fanout",
+            durable: sub.CustomExchange?.Durable ?? true,
+            autoDelete: sub.CustomExchange?.AutoDelete ?? false,
+            arguments: sub.CustomExchange?.Arguments
+        );
 
         var mainQueueArgs = new Dictionary<string, object>();
-        Action? afterMainQueueDeclared = null;
+        Action? afterMainQueueDeclared = SetupExchangeDeadLetter(sub, model, config, mainQueueName, mainQueueArgs);
 
-        if (exchangeSubscription.DeadLetterCycle is not null)
-        {
-            var deadLetterStartExchangeName = exchangeSubscription.DeadLetterCycle.CustomStartExchangeName
-                                              ?? ConsumerObjectNameHelper.GetConsumerGroupDeadLetterStartExchange(config.ConsumerGroup, exchangeSubscription.Name);
-            var deadLetterEndExchangeName = exchangeSubscription.DeadLetterCycle.CustomEndExchangeName
-                                            ?? ConsumerObjectNameHelper.GetConsumerGroupDeadLetterEndExchange(config.ConsumerGroup, exchangeSubscription.Name);
-            var deadLetterQueueName = exchangeSubscription.DeadLetterCycle.CustomQueueName
-                                      ?? ConsumerObjectNameHelper.GetConsumerGroupDeadLetterQueue(config.ConsumerGroup, exchangeSubscription.Name);
-
-            model.ExchangeDeclare(exchange: deadLetterStartExchangeName, "fanout", durable: true, autoDelete: false, arguments: null);
-            model.ExchangeDeclare(exchange: deadLetterEndExchangeName, "fanout", durable: true, autoDelete: false, arguments: null);
-
-            model.QueueDeclare(queue: deadLetterQueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: new Dictionary<string, object>
-                {
-                    {"x-message-ttl", (int) exchangeSubscription.DeadLetterCycle.Delay.TotalMilliseconds},
-                    {"x-dead-letter-exchange", deadLetterEndExchangeName},
-                });
-
-            model.QueueBind(queue: deadLetterQueueName, exchange: deadLetterStartExchangeName, string.Empty, arguments: null);
-
-            afterMainQueueDeclared = () => { model.QueueBind(queue: mainQueueName, exchange: deadLetterEndExchangeName, string.Empty, arguments: null); };
-
-            mainQueueArgs.Add("x-dead-letter-exchange", deadLetterStartExchangeName);
-        }
-
-        model.QueueDeclare(queue: mainQueueName,
-            durable: true,
-            exclusive: false,
-            autoDelete: false,
-            arguments: mainQueueArgs);
+        model.QueueDeclare(
+            queue: mainQueueName,
+            durable: sub.CustomQueue?.Durable ?? true,
+            exclusive: sub.CustomQueue?.Exclusive ?? false,
+            autoDelete: sub.CustomQueue?.AutoDelete ?? false,
+            arguments: Merge(mainQueueArgs, sub.CustomQueue?.Arguments));
 
         afterMainQueueDeclared?.Invoke();
 
-        model.QueueBind(queue: mainQueueName, exchange: exchangeSubscription.Name, string.Empty, arguments: null);
+        model.QueueBind(
+            queue: mainQueueName,
+            exchange: sub.Name,
+            routingKey: sub.CustomBinding?.RoutingKey ?? string.Empty,
+            arguments: sub.CustomBinding?.Arguments
+        );
+
         return mainQueueName;
+    }
+
+    private static Action? SetupExchangeDeadLetter(ExchangeSubscription sub, IModel model, ConsumerConfig config, string mainQueueName, IDictionary<string, object> mainQueueArgs)
+    {
+        if (sub.DeadLetterCycle is null)
+        {
+            return null;
+        }
+
+        var deadLetterStartExchangeName = sub.DeadLetterCycle.CustomStartExchange?.Exchange
+                                          ?? ConsumerObjectNameHelper.GetConsumerGroupDeadLetterStartExchange(config.ConsumerGroup, sub.Name);
+        var deadLetterEndExchangeName = sub.DeadLetterCycle.CustomEndExchange?.Exchange
+                                        ?? ConsumerObjectNameHelper.GetConsumerGroupDeadLetterEndExchange(config.ConsumerGroup, sub.Name);
+        var deadLetterQueueName = sub.DeadLetterCycle.CustomQueue?.Queue
+                                  ?? ConsumerObjectNameHelper.GetConsumerGroupDeadLetterQueue(config.ConsumerGroup, sub.Name);
+
+        // declare Start exchange
+        model.ExchangeDeclare(
+            exchange: deadLetterStartExchangeName,
+            type: sub.DeadLetterCycle.CustomStartExchange?.Type ?? "fanout",
+            durable: sub.DeadLetterCycle.CustomStartExchange?.Durable ?? true,
+            autoDelete: sub.DeadLetterCycle.CustomStartExchange?.AutoDelete ?? false,
+            arguments: sub.DeadLetterCycle.CustomStartExchange?.Arguments
+        );
+
+        // declare End exchange
+        model.ExchangeDeclare(
+            exchange: deadLetterEndExchangeName,
+            type: sub.DeadLetterCycle.CustomEndExchange?.Type ?? "fanout",
+            durable: sub.DeadLetterCycle.CustomEndExchange?.Durable ?? true,
+            autoDelete: sub.DeadLetterCycle.CustomEndExchange?.AutoDelete ?? false,
+            arguments: sub.DeadLetterCycle.CustomEndExchange?.Arguments
+        );
+
+        // declare error queue
+        model.QueueDeclare(queue: deadLetterQueueName,
+            durable: sub.DeadLetterCycle.CustomQueue?.Durable ?? true,
+            exclusive: sub.DeadLetterCycle.CustomQueue?.Exclusive ?? false,
+            autoDelete: sub.DeadLetterCycle.CustomQueue?.AutoDelete ?? false,
+            arguments: Merge(new Dictionary<string, object>
+            {
+                {"x-message-ttl", (int) sub.DeadLetterCycle.Delay.TotalMilliseconds},
+                {"x-dead-letter-exchange", deadLetterEndExchangeName},
+            }, sub.DeadLetterCycle.CustomQueue?.Arguments));
+
+        // bind error queue to Start exchange
+        model.QueueBind(
+            queue: deadLetterQueueName,
+            exchange: deadLetterStartExchangeName,
+            routingKey: sub.DeadLetterCycle.CustomStartQueueBinding?.RoutingKey ?? string.Empty,
+            arguments: sub.DeadLetterCycle?.CustomStartQueueBinding?.Arguments
+        );
+
+        // bind main queue to End exchange
+        void AfterMainQueueDeclared()
+        {
+            model.QueueBind(queue: mainQueueName, exchange: deadLetterEndExchangeName, routingKey: sub.DeadLetterCycle!.CustomMainQueueBinding?.RoutingKey ?? string.Empty,
+                arguments: sub.DeadLetterCycle!.CustomMainQueueBinding?.Arguments);
+        }
+
+        mainQueueArgs.Add("x-dead-letter-exchange", deadLetterStartExchangeName);
+        return AfterMainQueueDeclared;
+    }
+
+    private static Dictionary<string, object> Merge(Dictionary<string, object> defaultDict, IDictionary<string, object>? customDict)
+    {
+        if (customDict is null)
+        {
+            return defaultDict;
+        }
+
+        foreach (var (key, value) in customDict)
+        {
+            defaultDict[key] = value;
+        }
+
+        return defaultDict;
     }
 }

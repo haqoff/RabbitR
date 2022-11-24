@@ -1,4 +1,4 @@
-﻿using Rabbiter.Builders.Results;
+﻿using Rabbiter.Builders.Instances;
 using RabbitMQ.Client;
 
 namespace Rabbiter.Connections;
@@ -9,7 +9,7 @@ namespace Rabbiter.Connections;
 internal interface IConnectionHolder : IDisposable
 {
     /// <summary>
-    /// Creates a new connection if none has been created for the specified instance name.
+    /// Creates and performs initialization a new connection if none has been created for the specified instance name.
     /// Otherwise, returns the existing one.
     /// </summary>
     IConnection GetOrCreateConnection(InstanceBuildResult instance);

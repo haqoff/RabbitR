@@ -14,6 +14,7 @@ internal interface IMessageHandlerExecutor
     /// Deserializes the message, then calls the message handler.
     /// </summary>
     Task ExecuteAsync(
+        string queueName,
         ISubscription item,
         IServiceProvider provider,
         IConsumerLogger logger,

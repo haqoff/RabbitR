@@ -1,4 +1,4 @@
-﻿using Rabbiter.Builders.Results;
+﻿using Rabbiter.Builders.Instances;
 using Rabbiter.Connections;
 using Rabbiter.Consumers.Configurations;
 using Rabbiter.Loggers;

@@ -1,9 +1,12 @@
-﻿using Rabbiter.Builders.Results;
+﻿using Rabbiter.Builders.Instances.Consumers;
+using Rabbiter.Builders.Instances.Operations;
+using Rabbiter.Builders.Instances.Operations.Results;
+using Rabbiter.Builders.Instances.Producers;
 using Rabbiter.Connections;
 using Rabbiter.Consumers.Configurations;
 using Rabbiter.Producers;
 
-namespace Rabbiter.Builders;
+namespace Rabbiter.Builders.Instances;
 
 /// <summary>
 /// Represents an instance builder that allows you to configure consumers and producers.
@@ -14,6 +17,7 @@ public class InstanceBuilder
     private readonly ConnectionConfig _connectionConfig;
     private ConsumerBuildResult? _consumer;
     private ProducerBuildResult? _producer;
+    private InitOperationContainerBuildResult? _initOperationContainer;
 
     /// <summary>
     /// Initializes a new instance of the class <see cref="InstanceBuilder"/>.
@@ -55,10 +59,24 @@ public class InstanceBuilder
     }
 
     /// <summary>
+    /// Configures the operations that must be performed to initialize Rabbit MQ. For example, creating queues, exchange or binding them.
+    /// Operations are performed immediately after a successful connection is established.
+    /// </summary>
+    /// <param name="builderAction">Action that configures operations.</param>
+    public InstanceBuilder SetupInitOperations(Action<InitOperationBuilder> builderAction)
+    {
+        var builder = new InitOperationBuilder();
+        builderAction(builder);
+
+        _initOperationContainer = builder.Build();
+        return this;
+    }
+
+    /// <summary>
     /// Builds the result.
     /// </summary>
     internal InstanceBuildResult Build()
     {
-        return new InstanceBuildResult(_name, _connectionConfig, _consumer, _producer);
+        return new InstanceBuildResult(_name, _connectionConfig, _consumer, _producer, _initOperationContainer);
     }
 }

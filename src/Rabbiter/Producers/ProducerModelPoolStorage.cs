@@ -1,4 +1,4 @@
-﻿using Rabbiter.Builders.Results;
+﻿using Rabbiter.Builders.Instances;
 using Rabbiter.Connections;
 using Rabbiter.Utils;
 using RabbitMQ.Client;
@@ -24,11 +24,12 @@ internal class ProducerModelPoolStorage : IProducerModelPoolStorage
     /// <summary>
     /// Gets the channel pool for the specified instance named <paramref name="instanceName"/>.
     /// </summary>
+    /// <exception cref="KeyNotFoundException">The exception that is thrown when no pool is found for the instance.</exception>
     public LimitedPool<IModel> Get(string instanceName)
     {
         if (!_modelDictionary.TryGetValue(instanceName, out var pool))
         {
-            throw new InvalidOperationException($"Instance named \"{instanceName}\" did not have a registered producer.");
+            throw new KeyNotFoundException($"Instance named \"{instanceName}\" did not have a registered producer.");
         }
 
         return pool;
