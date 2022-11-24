@@ -10,6 +10,10 @@ Among the mechanisms:
 - Dependency Injection
 - Publication of messages through one interface with a pool of producers to reduce the load.
 
+## Install
+
+https://www.nuget.org/packages/RabbitR
+
 ## Example
 
 Let's create a message that we want to receive and process.
