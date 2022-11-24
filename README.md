@@ -168,7 +168,7 @@ When consumed from an exchange, the exchange itself (durable) with the specified
 #### Dead letter
 Call the *UseDeadLetter* method to configure the mechanism.
 The mechanism works as follows:
-![Принцип работы Dead Letter](1)
+![Принцип работы Dead Letter](docs/dead_letter.png)
 If an unhandled error occurs in the message handler, the message will go to the Dead Letter Start Exchange and its associated queue. Then, after the specified timeout, RabbitMQ will place this message on the End Exchange, which will be associated with the main queue. Thus, the message will be processed again. You can specify the maximum number of attempts, after which the message will stop going through this cycle.
 
  ### **SubscribeQueue** - to consume from the queue directly.
